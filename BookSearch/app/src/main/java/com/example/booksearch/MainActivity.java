@@ -34,7 +34,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         LoaderManager loaderManager = getSupportLoaderManager();
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
+        //Initialize the loadedr. Pass in the int ID constant defined abocve and pass in null for the bundle.
+        //Pass in this activity for the LoaderCallbacks paramter, (Which is bvaid becase this activity implements the LoaderCallback interface)
         LoaderManager.getInstance(this).initLoader(BOOK_LOADER_ID, null, this);
 
     }

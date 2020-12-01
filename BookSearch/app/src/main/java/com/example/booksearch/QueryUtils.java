@@ -19,16 +19,28 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Class used for handling the URL, making HTTP request and parsing JSON response.
+ */
 public class QueryUtils {
 
    /** private static final String query = "{\"kind\":\"books#volumes\",\"totalItems\":1814,\"items\":[{\"kind\":\"books#volume\",\"id\":\"qKFDDAAAQBAJ\"" +
             ", \"etag\":\"4QrBGtFnq2M\",\"volumeInfo\":{\"title\":\"Android\",\"authors\":[\"P.K. Dixit\"],\"publisher\":\"Vikas Publishing House\"}}]}";
     **/
     public static final String LOG_TAG = QueryUtils.class.getSimpleName();
+
+    /**
+     * Constructor for QueryUtils.
+     */
     private QueryUtils(){
 
     }
 
+    /**
+     * Creates the URL to be used in the HTTP request
+     * @param requestURL String containing the URL to make request
+     * @return An ArrayList with the books parsed from JSON response
+     */
     public static ArrayList<Book> fetchBooks(String requestURL){
         //Create URL object
         URL url = createURL(requestURL);
@@ -43,6 +55,11 @@ public class QueryUtils {
         return books;
     }
 
+    /**
+     *
+     * @param jsonResponse The response from URL query
+     * @return ArrayList with book objects.
+     */
     public static ArrayList<Book> extractBooksFeatures(String jsonResponse) {
         ArrayList<Book> books = new ArrayList<>();
         if (TextUtils.isEmpty(jsonResponse)) {
@@ -57,31 +74,27 @@ public class QueryUtils {
                 JSONObject volumeInfo = currentItem.getJSONObject("volumeInfo");
                 String title = volumeInfo.getString("title");
                 JSONArray authors = volumeInfo.getJSONArray("authors");
-                //StringBuilder authorNames = new StringBuilder();
-                LinkedList<String> authorNames = new LinkedList<String>();
+                StringBuilder authorNames = new StringBuilder();
+                ///LinkedList<String> authorNames = new LinkedList<String>();
                 for (int j = 0; j < authors.length(); j++) {
                     Log.i(LOG_TAG, "GETTING AUTHORS");
-                    //authors.getString(i);
-                    authorNames.add(authors.getString(j));
-                }
-                   /** if(j==0){
+                    authors.getString(i);
+                    ///authorNames.add(authors.getString(j));
+
+                    if (j == 0) {
                         authorNames.append(authors.getString(i));
-                    }else if (j == authors.length()-1){
-                        authorNames.append(authors.getString(i));
-                        authorNames.append('.');
-                    }else{
+                    } else {
                         authorNames.append(',');
                         authorNames.append(authors.getString(i));
                     }
                 }
+                authorNames.append('.');
                 JSONObject saleInfo = currentItem.getJSONObject("saleInfo");
                 boolean isEbook = saleInfo.getBoolean("isEbook");
                 JSONObject retailPrice = saleInfo.getJSONObject("listPrice");
                 double amount = retailPrice.getDouble("amount");
-                 **/
-                Book book = new Book(bookId, title, authorNames.toString());
-                Log.d(LOG_TAG,book.getTitle());
-                Log.d(LOG_TAG,book.getAuthors());
+
+                Book book = new Book(bookId, title, authorNames.toString(), amount, isEbook);
                 books.add(book);
             }
         } catch (JSONException e) {
@@ -90,6 +103,11 @@ public class QueryUtils {
         return books;
     }
 
+    /**
+     * Creates the URL from a give string
+     * @param stringURL The string to be converted
+     * @return URL object
+     */
     public static URL createURL(String stringURL){
         URL url = null;
         try{
@@ -101,6 +119,12 @@ public class QueryUtils {
         return url;
     }
 
+    /**
+     * Makes HTTP request
+     * @param url URL object to be used for connection
+     * @return jsonResponse as String obtained from query.
+     * @throws IOException If HTTP connection files
+     */
     public static String makeHTTPRequest(URL url) throws IOException{
         String jsonResponse = "";
         HttpURLConnection urlConnection = null;
@@ -133,7 +157,7 @@ public class QueryUtils {
         return jsonResponse;
     }
     /**
-     * Conver {@link InputStream} into a String which contains the whole JSON response from the server
+     * Convert {@link InputStream} into a String which contains the whole JSON response from the server
      */
     private static String readFromStream(InputStream inputStream)throws IOException{
         StringBuilder output = new StringBuilder();
