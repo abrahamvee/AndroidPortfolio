@@ -9,7 +9,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.BookViewHolder>{
 
@@ -33,13 +35,20 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.BookVi
     }
 
     private LayoutInflater mInflater;
-    private final LinkedList<Book> mBookList;
+    private final ArrayList<Book> mBookList;
 
-    public BookListAdapter(Context context, LinkedList<Book> bookList){
+    public BookListAdapter(Context context, ArrayList<Book> bookList){
         mInflater = LayoutInflater.from(context);
         this.mBookList = bookList;
     }
 
+    public void clear(){
+        mBookList.clear();
+    }
+
+    public void addAll(ArrayList<Book> books){
+        mBookList.addAll(books);
+    }
 
     @NonNull
     @Override
@@ -52,7 +61,7 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.BookVi
     public void onBindViewHolder(@NonNull BookListAdapter.BookViewHolder holder, int position) {
     String mTitle = mBookList.get(position).getTitle();
     holder.titleView.setText(mTitle);
-    String mAuthor = mBookList.get(position).getAuthors().toString();
+    String mAuthor = mBookList.get(position).getAuthors();
     holder.authorView.setText(mAuthor);
     }
 
