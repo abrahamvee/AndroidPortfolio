@@ -1,70 +1,56 @@
 package com.example.booksearch;
 
+import android.net.Uri;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Book object that contains title, authors, price and if it is available as eBook.
+ * Represents a book. Holds information such as: title, author's name and publication year.
+ * Thumbnail and additional information
  */
 
 public class Book {
 
-    private String bookId;
-    private String title;
-    private String authors;
-    private double price;
-    private boolean isEbook;
-    private String thumbnail;
+    //String for the book's title
+    private final String mTitle;
+    //String for the author's name
+    private final String mAuthor;
+    //String for the year of publication
+    private final String mPublishedYear;
+    //Uri for the thumbnail image of book
+    private final Uri mThumbnailUri;
+
 
     /**
-     * Constructor for book object
-     * @param bookId alfanumeric ID for book
-     * @param title Title of the book
-     * @param authors Authors of the book.
-     * @param price Retail price of the book
-     * @param isEbook Boolean Indicates if the book is an eBook or not.
+     * Book initializer
+     * @param title A string with the book title.
+     * @param author A String with the author's name
+     * @param publishedYear A string with the publication year
+     * @param thumbnailUri A string with the link to a thumbnail image for the book
+     *
      */
-    public Book(String bookId, String title, String authors, double price, boolean isEbook){
-        this.bookId = bookId;
-        this.title = title;
-        this.authors = authors;
-        this.price = price;
-        this.isEbook = isEbook;
+
+    Book(String title, String author, String publishedYear, String thumbnailUri){
+        mTitle = title;
+        mAuthor = author;
+        mPublishedYear = publishedYear;
+        mThumbnailUri = Uri.parse(thumbnailUri);
     }
 
-    /**
-     * Overloaded constructor for book object.
-     * @param bookId
-     * @param title
-     * @param authors
-     */
-    public Book(String bookId, String title, String authors){
-        this.bookId = bookId;
-        this.title = title;
-        this.authors = authors;
+    String getTitle(){
+        return mTitle;
     }
 
-    /**
-     * Getter method for the book title.
-     * @return the title of the book.
-     */
-    public String getTitle(){return title;}
+    String getAuthor(){
+        return mAuthor;
+    }
 
-    /**
-     * Getter method for the book's authors.
-     * @return Author or authors of the book.
-     */
-    public String getAuthors(){return authors;}
+    String getPublishedYear(){
+        return mPublishedYear;
+    }
 
-    /**
-     * Getter method for the price of the book.
-     * @return Price of the book as a double.
-     */
-    public Double getPrice(){return price;}
-
-    /**
-     * Getter method for boolean value that indicates if book is available as ebook.
-     * @return boolean value isEbook
-     */
-    public boolean getIsEbook(){return isEbook;}
+    Uri getThumbnailUri(){
+        return mThumbnailUri;
+    }
 }

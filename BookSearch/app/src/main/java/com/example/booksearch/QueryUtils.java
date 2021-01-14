@@ -20,7 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Class used for handling the URL, making HTTP request and parsing JSON response.
+ * Utility class used to query the Google Book's API.
  */
 public class QueryUtils {
 
@@ -37,7 +37,7 @@ public class QueryUtils {
     }
 
     /**
-     * Creates the URL to be used in the HTTP request
+     * Returns List of Books by using given URL to query API.
      * @param requestURL String containing the URL to make request
      * @return An ArrayList with the books parsed from JSON response
      */
@@ -56,12 +56,17 @@ public class QueryUtils {
     }
 
     /**
-     *
+     * Extract the features of the books from the JSON response from the server.
      * @param jsonResponse The response from URL query
      * @return ArrayList with book objects.
      */
     public static ArrayList<Book> extractBooksFeatures(String jsonResponse) {
         ArrayList<Book> books = new ArrayList<>();
+        String bookTitle = "";
+        String bookAuthor = "";
+        String bookPublishingYear = "";
+        String bookThumbnail = "";
+
         if (TextUtils.isEmpty(jsonResponse)) {
             return null;
         }
@@ -70,32 +75,37 @@ public class QueryUtils {
             JSONArray items = baseJsonResponse.getJSONArray("items");
             for (int i = 0; i < items.length(); i++) {
                 JSONObject currentItem = items.getJSONObject(i);
-                String bookId = currentItem.getString("id");
                 JSONObject volumeInfo = currentItem.getJSONObject("volumeInfo");
-                String title = volumeInfo.getString("title");
-                JSONArray authors = volumeInfo.getJSONArray("authors");
-                StringBuilder authorNames = new StringBuilder();
-                ///LinkedList<String> authorNames = new LinkedList<String>();
-                for (int j = 0; j < authors.length(); j++) {
-                    Log.i(LOG_TAG, "GETTING AUTHORS");
-                    authors.getString(i);
-                    ///authorNames.add(authors.getString(j));
-
-                    if (j == 0) {
-                        authorNames.append(authors.getString(i));
-                    } else {
-                        authorNames.append(',');
-                        authorNames.append(authors.getString(i));
+                //Get book's title
+                bookTitle = volumeInfo.getString("title");
+                //Get the book's authors
+                try{
+                    JSONArray authorsArray = volumeInfo.getJSONArray("authors");
+                    StringBuilder authorsStringBuilder = new StringBuilder();
+                    authorsStringBuilder.append(authorsArray.getString(0));
+                    for(int j=0; j<authorsArray.length(); j++){
+                        authorsStringBuilder.append(", ")
+                                .append(authorsArray.getString(j));
                     }
+                    bookAuthor = authorsStringBuilder.toString();
+                }catch (JSONException e){
+                    bookAuthor = "Author name not available";
                 }
-                authorNames.append('.');
-                JSONObject saleInfo = currentItem.getJSONObject("saleInfo");
-                boolean isEbook = saleInfo.getBoolean("isEbook");
-                JSONObject retailPrice = saleInfo.getJSONObject("listPrice");
-                double amount = retailPrice.getDouble("amount");
+                //Get the book's publishing date
+                try{
+                    bookPublishingYear = volumeInfo.getString("publishedDate").substring(0,4);
+                }catch (JSONException e){
+                    bookPublishingYear = "No date available";
+                    Log.e("QueryUtils", "Problem parsing the book JSON response", e);
+                }
+                //Try getting the book cover thumbnail URL
+                try{
+                    bookThumbnail = volumeInfo.getJSONObject("imageLinks").getString("smallThumbnail");
+                }catch (JSONException e){
+                    Log.e("QueryUtils", "Problem parsing the book JSON response", e);
+                }
 
-                Book book = new Book(bookId, title, authorNames.toString(), amount, isEbook);
-                books.add(book);
+                books.add(new Book(bookTitle, bookAuthor, bookPublishingYear, bookThumbnail));
             }
         } catch (JSONException e) {
             Log.e("QueryUtils", "Problem parsing the book JSON response", e);

@@ -22,11 +22,14 @@ public class BookLoader extends AsyncTaskLoader<ArrayList<Book>> {
      * @param context context of the activity
      * @param url to load data from
      */
+
     public BookLoader(Context context, String url){
         super(context);
         mUrl = url;
     }
-
+    public BookLoader(Context context){
+        super(context);
+    }
     /**
      * this is on background thread, starts the bakground task, using forceLoad
      */
@@ -34,7 +37,6 @@ public class BookLoader extends AsyncTaskLoader<ArrayList<Book>> {
         Log.d(LOG_TAG, "Start Loading");
         forceLoad();
     }
-
 
     @Override
     public ArrayList<Book> loadInBackground(){

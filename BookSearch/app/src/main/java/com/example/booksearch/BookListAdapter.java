@@ -4,10 +4,15 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -18,39 +23,9 @@ import java.util.List;
  */
 public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.BookViewHolder>{
 
-    /**
-     * Inner class of BookListAdapter, for ViewHolder of book object.
-     */
-    class BookViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        public final TextView titleView;
-        public final TextView authorView;
-        public final TextView priceView;
-        public final TextView isEbookView;
-        final BookListAdapter mAdapter;
-
-        /**
-         * Constructor of BookViewHolder object.
-         * @param itemView The itemView for one book object.
-         * @param adapter The adapter that is used for book objects.
-         */
-        public BookViewHolder(View itemView, BookListAdapter adapter){
-            super(itemView);
-            titleView = itemView.findViewById(R.id.title);
-            authorView = itemView.findViewById(R.id.authors);
-            priceView = itemView.findViewById(R.id.price);
-            isEbookView = itemView.findViewById(R.id.ebook);
-            this.mAdapter = adapter;
-            itemView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-
-        }
-    }
-
     private LayoutInflater mInflater;
-    private final ArrayList<Book> mBookList;
+    private final List<Book> mBookList;
+    Context context;
 
     /**
      * BookListAdapter constructor.
@@ -60,6 +35,7 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.BookVi
     public BookListAdapter(Context context, ArrayList<Book> bookList){
         mInflater = LayoutInflater.from(context);
         this.mBookList = bookList;
+        this.context = context;
     }
 
     /**
@@ -97,15 +73,21 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.BookVi
      */
     @Override
     public void onBindViewHolder(@NonNull BookListAdapter.BookViewHolder holder, int position) {
-    String mTitle = mBookList.get(position).getTitle();
-    String mAuthor = mBookList.get(position).getAuthors();
-    String mPrice = mBookList.get(position).getPrice().toString();
-    boolean mIsEbook = mBookList.get(position).getIsEbook();
+        String mTitle = mBookList.get(position).getTitle();
+        String mAuthor = mBookList.get(position).getAuthor();
+        String mPublishedDate = mBookList.get(position).getPublishedYear();
 
-    holder.titleView.setText(mTitle);
-    holder.authorView.setText(mAuthor);
-    holder.priceView.setText(mPrice);
-    if(mIsEbook) holder.isEbookView.setText("Ebook");
+        holder.titleView.setText(mTitle);
+        holder.authorView.setText(mAuthor);
+        holder.publishedYearView.setText(mPublishedDate);
+
+        if (!mBookList.get(position).getThumbnailUri().toString().isEmpty()){
+            Glide.with(context).load(mBookList.get(position).getThumbnailUri()).into(holder.thumbnailView);
+        }else{
+            Glide.with(context).load(R.drawable.ic_baseline_book_24).into(holder.thumbnailView);
+            holder.thumbnailView.setImageAlpha(50);
+        }
+
     }
 
     /**
@@ -116,5 +98,37 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.BookVi
     public int getItemCount() {
         return mBookList.size();
     }
+
+    /**
+     * Inner class of BookListAdapter, for ViewHolder of book object.
+     */
+    class BookViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+        public final TextView titleView;
+        public final TextView authorView;
+        public final TextView publishedYearView;
+        public final ImageView thumbnailView;
+        final BookListAdapter mAdapter;
+
+        /**
+         * Constructor of BookViewHolder object.
+         * @param itemView The itemView for one book object.
+         * @param adapter The adapter that is used for book objects.
+         */
+        public BookViewHolder(View itemView, BookListAdapter adapter){
+            super(itemView);
+            titleView = itemView.findViewById(R.id.title);
+            authorView = itemView.findViewById(R.id.authors);
+            publishedYearView = itemView.findViewById(R.id.publishedDate);
+            thumbnailView = itemView.findViewById(R.id.book_thumbnail);
+            this.mAdapter = adapter;
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+
+        }
+    }
+
 
 }
