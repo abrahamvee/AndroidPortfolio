@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">BookSearch</string>
+    <string name="no_data_available">Use a keyword to search for a book.</string>
 </resources>
