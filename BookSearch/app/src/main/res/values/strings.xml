@@ -8,5 +8,8 @@
     <string name="settings_max_results_key">max_num_results</string>
     <string name="settings_max_results_default">10</string>
 
-
+    <string name = "settings_langrestrict_title">Language restriction</string>
+    <string name = "settings_langrestrict_summary">Filter results to a specific language</string>
+    <string name = "settings_langrestrict_key" translatable="false">langRestrict</string>
+    <string name = "settings_langrestrict_default" translatable="false">none</string>
 </resources>

@@ -37,15 +37,16 @@ public class MainActivity extends AppCompatActivity implements androidx.loader.a
     private String keywordToSearch;
     private TextView emptyView;
     private static final int BOOK_LOADER_ID = 1;
+    private  static String langRestrictKey;
+    private  static String langRestrictValue;
+    private static String maxResultKey;
+    private static String maxResultValue;
 
     private final SearchView.OnQueryTextListener searchViewOnQueryTextListener = new SearchView.OnQueryTextListener() {
         @Override
         public boolean onQueryTextSubmit(String query) {
             mAdapter.clear();
-            //qryStr = new StringBuilder();
-            //qryStr.append("https://www.googleapis.com/books/v1/volumes?q=");
-            //qryStr.append(query).append("&maxResults=10");
-            //qryStr.append(query);
+
             keywordToSearch = query;
             //On callback call MainActivity.this which implements the interface
             androidx.loader.app.LoaderManager.getInstance(MainActivity.this).restartLoader(BOOK_LOADER_ID,null, MainActivity.this);
@@ -109,11 +110,15 @@ public class MainActivity extends AppCompatActivity implements androidx.loader.a
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String maxResults = sharedPreferences.getString(getString(R.string.settings_max_results_key),getString(R.string.settings_max_results_default));
+        String langRestricts = sharedPreferences.getString(getString(R.string.settings_langrestrict_key), getString(R.string.settings_langrestrict_default));
         Uri baseUri = Uri.parse(BOOK_REQUEST_URL_BASE);
         Uri.Builder uriBuilder = baseUri.buildUpon();
 
         uriBuilder.appendQueryParameter("q",keywordToSearch);
         uriBuilder.appendQueryParameter("maxResults", maxResults);
+        if(!langRestricts.equals("none")){
+            uriBuilder.appendQueryParameter(getString(R.string.settings_langrestrict_key),langRestricts);
+        }
 
         return new BookLoader(this, uriBuilder.toString());
     }

@@ -10,4 +10,13 @@
         android:selectAllOnFocus="true"
         android:title="@string/settings_max_results_label"
         />
+
+    <ListPreference
+        android:defaultValue = "@string/settings_langrestrict_default"
+        android:entries = "@array/settings_langrestrict_entry_names"
+        android:entryValues = "@array/settings_langrestrict_entry_values"
+        android:key = "@string/settings_langrestrict_key"
+        android:summary = "@string/settings_langrestrict_summary"
+        android:title = "@string/settings_langrestrict_title" />
+
 </PreferenceScreen>
