@@ -7,4 +7,12 @@
         android:icon="@drawable/ic_baseline_search_24"
         app:showAsAction="always|collapseActionView"
         app:actionViewClass="androidx.appcompat.widget.SearchView"/>
+
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/settings_menu_item"
+        android:icon="@drawable/ic_baseline_settings_24"
+        android:orderInCategory="1"
+        app:showAsAction="ifRoom" />
+
 </menu>

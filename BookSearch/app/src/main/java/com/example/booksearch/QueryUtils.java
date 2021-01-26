@@ -1,5 +1,6 @@
 package com.example.booksearch;
 
+import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -24,10 +25,8 @@ import java.util.List;
  */
 public class QueryUtils {
 
-   /** private static final String query = "{\"kind\":\"books#volumes\",\"totalItems\":1814,\"items\":[{\"kind\":\"books#volume\",\"id\":\"qKFDDAAAQBAJ\"" +
-            ", \"etag\":\"4QrBGtFnq2M\",\"volumeInfo\":{\"title\":\"Android\",\"authors\":[\"P.K. Dixit\"],\"publisher\":\"Vikas Publishing House\"}}]}";
-    **/
     public static final String LOG_TAG = QueryUtils.class.getSimpleName();
+    private static final String BOOK_REQUEST_URL_BASE = "https://www.googleapis.com/books/v1/volumes";
 
     /**
      * Constructor for QueryUtils.
@@ -43,11 +42,11 @@ public class QueryUtils {
      */
     public static ArrayList<Book> fetchBooks(String requestURL){
         //Create URL object
-        URL url = createURL(requestURL);
         //Perform HTTP request URL and receive a JSON response
+        //URL url = createURL(requestURL);
         String jsonResponse = null;
         try{
-            jsonResponse = makeHTTPRequest(url);
+            jsonResponse = makeHTTPRequest(createURL(requestURL));
         }catch (IOException e){
             Log.e(LOG_TAG, "Problem making the HTTP request",e);
         }
@@ -100,7 +99,7 @@ public class QueryUtils {
                 }
                 //Try getting the book cover thumbnail URL
                 try{
-                    bookThumbnail = volumeInfo.getJSONObject("imageLinks").getString("smallThumbnail");
+                    bookThumbnail = volumeInfo.getJSONObject("imageLinks").getString("thumbnail");
                 }catch (JSONException e){
                     Log.e("QueryUtils", "Problem parsing the book JSON response", e);
                 }
@@ -166,6 +165,7 @@ public class QueryUtils {
         }
         return jsonResponse;
     }
+
     /**
      * Convert {@link InputStream} into a String which contains the whole JSON response from the server
      */

@@ -10,9 +10,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,13 +28,13 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity implements androidx.loader.app.LoaderManager.LoaderCallbacks<ArrayList<Book>> {
 
     public static final String LOG_TAG = MainActivity.class.getName();
-
-    private RecyclerView mRecyclerView;
     private BookListAdapter mAdapter;
+    private RecyclerView mRecyclerView;
+    private boolean recyclerViewFull = false;
     //private static final String BOOK_REQUEST_URL = "https://www.googleapis.com/books/v1/volumes?q=cocina&maxResults=10";
+    private static final String BOOK_REQUEST_URL_BASE = "https://www.googleapis.com/books/v1/volumes";
     private StringBuilder qryStr;
-    private SearchView searchView;
-    private boolean isConnected;
+    private String keywordToSearch;
     private TextView emptyView;
     private static final int BOOK_LOADER_ID = 1;
 
@@ -38,29 +42,20 @@ public class MainActivity extends AppCompatActivity implements androidx.loader.a
         @Override
         public boolean onQueryTextSubmit(String query) {
             mAdapter.clear();
-            qryStr = new StringBuilder();
-            qryStr.append("https://www.googleapis.com/books/v1/volumes?q=");
-            qryStr.append(query).append("&maxResults=10");
-            String string2query = qryStr.toString();
+            //qryStr = new StringBuilder();
+            //qryStr.append("https://www.googleapis.com/books/v1/volumes?q=");
+            //qryStr.append(query).append("&maxResults=10");
+            //qryStr.append(query);
+            keywordToSearch = query;
             //On callback call MainActivity.this which implements the interface
             androidx.loader.app.LoaderManager.getInstance(MainActivity.this).restartLoader(BOOK_LOADER_ID,null, MainActivity.this);
             android.content.Loader<Object> loader0 = getLoaderManager().getLoader(BOOK_LOADER_ID);
-
             if(loader0 != null){
                 loader0.forceLoad();
             }
 
-            /**
-            if (mAdapter.getItemCount() == 0 ){
-                mRecyclerView.setVisibility(View.GONE);
-                emptyView.setVisibility(View.VISIBLE);
-            }else{
-                mRecyclerView.setVisibility(View.VISIBLE);
-                emptyView.setVisibility(View.GONE);
-            }**/
             emptyView.setVisibility(View.GONE);
             return true;
-
         }
 
         @Override
@@ -69,28 +64,32 @@ public class MainActivity extends AppCompatActivity implements androidx.loader.a
         }
     };
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview);
+        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview);
         emptyView = (TextView) findViewById(R.id.empty_view);
         mAdapter = new BookListAdapter(this, new ArrayList<Book>());
         LoaderManager loaderManager = getSupportLoaderManager();
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        //To check connectivity of application
-        ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        isConnected = activeNetwork != null &&
-                activeNetwork.isConnectedOrConnecting();
         if (mAdapter.getItemCount() == 0 ){
             //mRecyclerView.setVisibility(View.GONE);
             emptyView.setVisibility(View.VISIBLE);
         }else{
             emptyView.setVisibility(View.GONE);
         }
-
+        if(savedInstanceState!= null){
+            emptyView.setVisibility(View.GONE);
+            keywordToSearch = savedInstanceState.getString("keyword");
+            androidx.loader.app.LoaderManager.getInstance(MainActivity.this).restartLoader(BOOK_LOADER_ID,null, MainActivity.this);
+            android.content.Loader<Object> loader0 = getLoaderManager().getLoader(BOOK_LOADER_ID);
+            if(loader0 != null){
+                loader0.forceLoad();
+            }
+        }
     }
 
     @Override
@@ -107,7 +106,16 @@ public class MainActivity extends AppCompatActivity implements androidx.loader.a
     @NonNull
     @Override
     public Loader<ArrayList<Book>> onCreateLoader(int id, @Nullable Bundle args) {
-        return new BookLoader(this, qryStr.toString());
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String maxResults = sharedPreferences.getString(getString(R.string.settings_max_results_key),getString(R.string.settings_max_results_default));
+        Uri baseUri = Uri.parse(BOOK_REQUEST_URL_BASE);
+        Uri.Builder uriBuilder = baseUri.buildUpon();
+
+        uriBuilder.appendQueryParameter("q",keywordToSearch);
+        uriBuilder.appendQueryParameter("maxResults", maxResults);
+
+        return new BookLoader(this, uriBuilder.toString());
     }
 
     @Override
@@ -128,4 +136,22 @@ public class MainActivity extends AppCompatActivity implements androidx.loader.a
         mAdapter.clear();
         mAdapter.notifyDataSetChanged();
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putString("keyword",keywordToSearch);
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            Intent settingsIntent = new Intent(this, SettingsActivity.class);
+            startActivity(settingsIntent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 }

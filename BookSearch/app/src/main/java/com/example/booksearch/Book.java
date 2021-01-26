@@ -2,6 +2,7 @@ package com.example.booksearch;
 
 import android.net.Uri;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class Book {
     //String for the year of publication
     private final String mPublishedYear;
     //Uri for the thumbnail image of book
-    private final Uri mThumbnailUri;
+    private final String mThumbnailUri;
 
 
     /**
@@ -35,7 +36,7 @@ public class Book {
         mTitle = title;
         mAuthor = author;
         mPublishedYear = publishedYear;
-        mThumbnailUri = Uri.parse(thumbnailUri);
+        mThumbnailUri = thumbnailUri;
     }
 
     String getTitle(){
@@ -50,7 +51,7 @@ public class Book {
         return mPublishedYear;
     }
 
-    Uri getThumbnailUri(){
+    String getThumbnailUri(){
         return mThumbnailUri;
     }
 }
